@@ -2,6 +2,15 @@
 
 # Python
 
+## Dependency Management
+I used to use `pip` or `pip3` to install dependencies on machines, or use
+`virtualenv` to manage more complex, or conflicting, deps. I think moving
+forward, [I'll be using Pipenv](https://pipenv.readthedocs.io/en/latest/).
+
+## Type Hints
+[Type hints cheat sheet (Python
+3)](https://mypy.readthedocs.io/en/latest/cheat_sheet_py3.html)
+
 ## YAML
 [`ruamel.yaml`](https://yaml.readthedocs.io/en/latest/pyyaml.html) support
 round-trip loading and dumping while maintaning comments, and is more

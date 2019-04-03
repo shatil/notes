@@ -1,5 +1,30 @@
 # Notes
 
+# AWS
+
+## IAM
+
+### Policy Document for ECS Secrets
+Required for decrypting secret environment variables by `ecsTaskExecutionRole`.
+Using KMS's default key, so don't need to spcify "kms:Decrypt".
+
+* https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_execution_IAM_role.html#task-execution-secrets
+* https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html#secrets-iam
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Secrets",
+            "Effect": "Allow",
+            "Action": ["ssm:GetParameters"],
+            "Resource": ["arn:aws:ssm:*:*:parameter/ecs/*"]
+        }
+    ]
+}
+```
+
 # Python
 
 ## Dependency Management

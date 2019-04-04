@@ -18,7 +18,7 @@ Using KMS's default key, so don't need to spcify "kms:Decrypt".
         {
             "Sid": "Secrets",
             "Effect": "Allow",
-            "Action": ["ssm:GetParameters"],
+            "Action": ["ssm:GetParameter"],
             "Resource": ["arn:aws:ssm:*:*:parameter/ecs/*"]
         }
     ]

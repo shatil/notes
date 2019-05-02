@@ -32,6 +32,21 @@ I used to use `pip` or `pip3` to install dependencies on machines, or use
 `virtualenv` to manage more complex, or conflicting, deps. I think moving
 forward, [I'll be using Pipenv](https://pipenv.readthedocs.io/en/latest/).
 
+## Logging
+I like this Python logging configuration:
+
+```python
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+```
+
+It looks like:
+
+```
+2019-04-04 22:48:24,716 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+```
+
 ## Type Hints
 [Type hints cheat sheet (Python
 3)](https://mypy.readthedocs.io/en/latest/cheat_sheet_py3.html)

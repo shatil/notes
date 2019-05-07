@@ -25,6 +25,16 @@ Using KMS's default key, so don't need to spcify "kms:Decrypt".
 }
 ```
 
+# Golang
+
+## Trigger `url.Parse` error
+I [learned how to cause `url.Parse` to produce an
+error](https://golang.org/src/net/url/url_test.go) during testing:
+
+```go
+url.Parse("%")
+```
+
 # Python
 
 ## Dependency Management

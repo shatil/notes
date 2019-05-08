@@ -27,6 +27,26 @@ Using KMS's default key, so don't need to spcify "kms:Decrypt".
 
 # Golang
 
+## Iterate line-by-line over file
+
+```go
+scanner := bufio.NewScanner(f)
+for scanner.Scan() {
+	line := scanner.Text()  // might want to strings.TrimSpace()
+}
+if err := scanner.Err(); err != nil {
+	log.Fatal(err)
+}
+```
+
+Parsing long (like HTTP log) lines requires a larger buffer:
+
+```go
+// Start w/ min buf size 64 KiB and max to 512 MiB _per line_ to reduce chance of:
+// "reading standard input: bufio.Scanner: token too long"
+scanner.Buffer(make([]byte, 64*1024), 512*1024*1024)
+```
+
 ## Trigger `url.Parse` error
 I [learned how to cause `url.Parse` to produce an
 error](https://golang.org/src/net/url/url_test.go) during testing:

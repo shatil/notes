@@ -86,16 +86,17 @@ It looks like:
 round-trip loading and dumping while maintaning comments, and is more
 feature-rich than `PyYAML`.
 
-```
+```python
 pip3 install ruamel.yaml==0.15.89  # YAML module that preserves comments
 ```
 
-```
+```python
 import ruamel.yaml
 ```
 
 ### Load and Preserve Comments in YAML file
-```
+
+```python
 with open(fp) as f:
     d = ruamel.yaml.round_trip_load(f, preserve_quotes=True)
 ```
@@ -104,7 +105,7 @@ with open(fp) as f:
 This works great for things like `serverless.yml` files. For CloudFormation, I
 think using the built-in YAML conversion is a better idea.
 
-```
+```python
 with open(fp, "w") as f:
     yml = yaml.YAML()
     yml.indent(mapping=2, sequence=4, offset=2)

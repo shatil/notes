@@ -62,19 +62,12 @@ I used to use `pip` or `pip3` to install dependencies on machines, or use
 `virtualenv` to manage more complex, or conflicting, deps. I think moving
 forward, [I'll be using Pipenv](https://pipenv.readthedocs.io/en/latest/).
 
-## Logging
-I like this Python logging configuration:
-
-```python
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-```
-
-It looks like:
+`brew install pipenv` and get an environment going for a project with the
+following, which will create the necessary files for re-install of
+version-locked modules:
 
 ```
-2019-04-04 22:48:24,716 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+pipenv install coloredlogs
 ```
 
 ## Type Hints
@@ -86,7 +79,7 @@ It looks like:
 round-trip loading and dumping while maintaning comments, and is more
 feature-rich than `PyYAML`.
 
-```python
+```
 pip3 install ruamel.yaml==0.15.89  # YAML module that preserves comments
 ```
 
@@ -110,4 +103,29 @@ with open(fp, "w") as f:
     yml = yaml.YAML()
     yml.indent(mapping=2, sequence=4, offset=2)
     yml.dump(d, stream=f)
+```
+
+## `argparse`
+[Show defaults](https://stackoverflow.com/a/12151325/11536029) for `--help`
+with `argparse`:
+
+```python
+argparse.ArgumentParser(
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+```
+
+## `logging`
+I like this Python logging configuration:
+
+```python
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+```
+
+It looks like:
+
+```
+2019-04-04 22:48:24,716 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
 ```

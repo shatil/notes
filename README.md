@@ -115,6 +115,29 @@ argparse.ArgumentParser(
 )
 ```
 
+### Sub-commands
+`git` sub-command-like CLIs using subparsers is possible with Python.
+
+```python
+p = argparse.ArgumentParser()
+s = p.add_subparsers(dest="choice", title="choice", required=True)
+action = s.add_parser("action")
+action.add_argument("--dry-run", action="store_true")
+```
+
+`p`, `s`, and `action` above [all support their own
+description](https://docs.python.org/3/library/argparse.html#sub-commands),
+etc.
+
+Use conditionals to figure out what to do:
+
+```python
+args = p.parse_args()
+if args.choice == "action":
+    if args.dry_run:
+        pass
+```
+
 ## `logging`
 I like this Python logging configuration:
 

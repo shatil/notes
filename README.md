@@ -47,6 +47,27 @@ Parsing long (like HTTP log) lines requires a larger buffer:
 scanner.Buffer(make([]byte, 64*1024), 512*1024*1024)
 ```
 
+## Tick with initial burst
+[Gist has
+details](https://gist.github.com/shatil/0ca9fd3cf93827c65ba6378324f72c75) on
+how to throttle or limit concurrency by time _with_ an initial burst.
+
+```go
+func TickBurst(interval time.Duration, size int) <-chan time.Time {
+	c := make(chan time.Time, size)
+	for i := 0; i < size; i++ {
+		c <- time.Now()
+	}
+	go func() {
+		t := time.Tick(interval)
+		for {
+			c <- <-t
+		}
+	}()
+	return c
+}
+```
+
 ## Trigger `url.Parse` error
 I [learned how to cause `url.Parse` to produce an
 error](https://golang.org/src/net/url/url_test.go) during testing:

@@ -2,6 +2,48 @@
 
 # AWS
 
+## EC2
+
+### Resize Root Partition
+You can resize (in this case, just grow) an EC2 Instance's root EBS volume
+using EC2 Console, and
+[then](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html):
+
+Before:
+
+```
+[ec2-user@ip-10-10-10-10 ~]$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs         16G   80K   16G   1% /dev
+tmpfs            16G     0   16G   0% /dev/shm
+/dev/nvme0n1p1   32G   25G  7.0G  78% /
+```
+
+Running:
+
+```
+[ec2-user@ip-10-10-10-10 ~]$ sudo growpart /dev/nvme0n1 1
+CHANGED: disk=/dev/nvme0n1 partition=1: start=4096 old: size=67104734,end=67108830 new: size=2097147870,end=2097151966
+
+[ec2-user@ip-10-10-10-10 ~]$ sudo resize2fs /dev/nvme0n1p1
+resize2fs 1.43.5 (04-Aug-2017)
+Filesystem at /dev/nvme0n1p1 is mounted on /; on-line resizing required
+old_desc_blocks = 2, new_desc_blocks = 63
+The filesystem on /dev/nvme0n1p1 is now 262143483 (4k) blocks long.
+```
+
+Use `xfs_growfs -d /` instead of `resize2fs` if you're on Amazon Linux 2.
+
+After:
+
+```
+[ec2-user@ip-10-10-10-10 ~]$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs         16G   80K   16G   1% /dev
+tmpfs            16G     0   16G   0% /dev/shm
+/dev/nvme0n1p1  985G   25G  960G   3% /
+```
+
 ## IAM
 
 ### Policy Document for ECS Secrets
@@ -23,6 +65,61 @@ Using KMS's default key, so don't need to spcify "kms:Decrypt".
         }
     ]
 }
+```
+
+# Chef
+
+## Attributes
+
+### Update Node Attributes from EC2 Metadata
+[EC2
+Metadata](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)
+is useful for templates requiring details like `instanceId`.
+
+```ruby
+require 'json'
+require 'net/http'
+
+# Some metadata from EC2.
+client = Net::HTTP.new('169.254.169.254', 80)
+client.open_timeout = 0.5  # running outside AWS, this'll time out
+client.read_timeout = 0.5  # running outside AWS, this'll time out
+begin
+  # Body looks like:
+  # $ curl -w '\n' http://169.254.169.254/latest/dynamic/instance-identity/document
+  #    {
+  #      "accountId" : "123456789010",
+  #      "architecture" : "x86_64",
+  #      "availabilityZone" : "us-east-3c",
+  #      "billingProducts" : null,
+  #      "devpayProductCodes" : null,
+  #      "imageId" : "ami-deadbeef"
+  #      "instanceId" : "i-0cfe83617566afd9e",
+  #      "instanceType" : "m4.large",
+  #      "kernelId" : null,
+  #      "pendingTime" : "2017-04-27T15:29:50Z",
+  #      "privateIp" : "10.0.0.10",
+  #      "ramdiskId" : null,
+  #      "region" : "us-east-3",
+  #      "version" : "2010-08-31",
+  #    }
+  body = client.get('/latest/dynamic/instance-identity/document').body
+  document = JSON.parse(body)
+rescue Errno::EHOSTUNREACH, JSON::ParserError, Net::OpenTimeout, Net::ReadTimeout
+  document = {}
+end
+default.update(document)
+default['region'] = document.fetch('region', 'us-east-3')
+```
+
+Public IP from EC2 Metadata:
+
+```ruby
+begin
+  addr = client.get('/latest/meta-data/public-ipv4').body
+rescue Net::OpenTimeout, Net::ReadTimeout, Errno::EHOSTUNREACH
+  addr = 'localhost'
+end
 ```
 
 # Golang

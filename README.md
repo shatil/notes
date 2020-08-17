@@ -133,6 +133,22 @@ rescue Net::OpenTimeout, Net::ReadTimeout, Errno::EHOSTUNREACH
 end
 ```
 
+## GitHub
+
+Visit account [Settings/Emails](https://github.com/settings/emails) to find
+GitHub no-reply email address, then [set it for a single
+repository](https://docs.github.com/en/github/setting-up-and-managing-your-github-user-account/setting-your-commit-email-address#setting-your-email-address-for-a-single-repository).
+
+```bash
+git config user.email "email@example.com"
+```
+
+Confirm:
+
+```bash
+git config user.email
+```
+
 ## Golang
 
 ### Data race
@@ -181,6 +197,43 @@ overflow := shelf.overflow
 heap.Push(&overflow, order)
 ```
 
+### Get file descriptor number for open file
+
+It's of type `uintptr`, so may need to be cast to `int()`, like for
+[`os.Stdin`](https://golang.org/pkg/os/#pkg-variables).
+
+```go
+int(os.Stdin.Fd())
+```
+
+### List of values for `flag`
+
+Use [`flag.Var`](https://golang.org/pkg/flag/#Var) to create a CLI argument
+that appends to a slice. Can `append` the original type!
+
+```go
+// Nargs represents some number of command line arguments.
+type Nargs []string
+
+// Set value of named CLI flag.
+func (nargs *Nargs) Set(name, value string) error {
+	*nargs = append(*nargs, value)
+	return nil
+}
+
+// String comma-delimits members of Nargs.
+func (nargs Nargs) String() string {
+	return strings.Join([]string(nargs), ", ")
+}
+```
+
+Then wherever `flag` is configured:
+
+```go
+n := Nargs{}
+flag.Var(&n, "nargs", "append to list of arguments with each invocation")
+```
+
 ### Iterate line-by-line over file
 
 ```go
@@ -199,6 +252,44 @@ Parsing long (like HTTP log) lines requires a larger buffer:
 // Start w/ min buf size 64 KiB and max to 512 MiB _per line_ to reduce chance of:
 // "reading standard input: bufio.Scanner: token too long"
 scanner.Buffer(make([]byte, 64*1024), 512*1024*1024)
+```
+
+### Prefix lines written to `io.Writer` like `os.Stdout`
+
+Go abstracts things writing to files with interfaces like `io.Writer` or
+`io.ReadWriter`. Sometimes, lines written require a prefix. See it in
+[action](https://play.golang.org/p/orR5ifLdPJZ) on Go Playground.
+
+
+```go
+// PrefixWriter writes a prefix before each line supplied.
+type PrefixWriter struct {
+	io.Writer
+	Prefix      []byte
+	Destination io.Writer
+}
+
+// Write to Destination io.Writer with a prefix before each line.
+//
+// '\n' line-endings are used, meaning '\r' is preserved for DOS line ends.
+func (pw *PrefixWriter) Write(paragraph []byte) (written int, err error) {
+	last := len(paragraph) - 1 // reduces ns/op
+	line := pw.Prefix          // recycling reduces B/op and allocs/op
+	position := 0
+
+	for i, character := range paragraph {
+		if character == '\n' || i == last {
+			line = append(line[:len(pw.Prefix)], paragraph[position:i+1]...)
+			n, err := pw.Destination.Write(line)
+			if err != nil {
+				return written, err
+			}
+			written += n - len(pw.Prefix)
+			position = i + 1
+		}
+	}
+	return
+}
 ```
 
 ### Tick with initial burst

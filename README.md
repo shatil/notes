@@ -133,6 +133,82 @@ rescue Net::OpenTimeout, Net::ReadTimeout, Errno::EHOSTUNREACH
 end
 ```
 
+## Git
+
+Modifying Git history is possible, and Git supplies some really useful filters
+to accomplish this. Changes apply starting from and "earlier" commit and going
+towards a more recent commit, i.e., `HEAD`. Impact? If I rename a folder, I'll
+have to check for its existence or the Git history editing will fail.
+
+Remember to operate on a fresh clone and not lose work.
+
+### Delete files from Git history
+
+```bash
+$ git filter-branch --tree-filter 'rm -rf references salary  shaatibiyyah' HEAD
+Rewrite 54741c76bb97e699f0daa63a6ee32e955c0a97e6 (34/63) (1 seconds passed, remaining 0 predicted)
+Ref 'refs/heads/master' was rewritten
+```
+
+This expunges the specified files or directories from Git history. This
+`--tree-filter` command can be something else, e.g., `mv`. Just the [first
+example](https://dalibornasevic.com/posts/2-permanently-remove-files-and-folders-from-a-git-repository)
+worked.
+
+If you run `filter-branch` again, you'll get an error because there's a backup!
+So run it with `-f`.
+
+```text
+Cannot create a new backup.
+A previous backup already exists in refs/original/
+Force overwriting the backup with -f
+```
+
+### Move or rename files while preserving Git history
+
+If using a command like `mv` that fails if something is missing, check for its
+existence. [Example from StackOverflow](https://stackoverflow.com/a/15135004):
+
+```bash
+$ git filter-branch -f --tree-filter \
+    'if [ -d letters ]; then mv letters/* .; rmdir letters; fi' \
+    HEAD
+Rewrite 55b23698eae0b1761c7122c43e428e588922e1d9 (38/63) (1 seconds passed, remaining 0 predicted)
+Ref 'refs/heads/master' was rewritten
+```
+
+### Prune empty commits from Git history
+
+Delete or remove commits that are empty (maybe as a result of repo surgery above?):
+
+```bash
+$ git filter-branch --prune-empty --tag-name-filter cat -- --all
+Rewrite 71057ef757c335d07876099ede72d4ae82f3fbc3 (55/63) (1 seconds passed, remaining 0 predicted)
+Ref 'refs/heads/master' was rewritten
+Ref 'refs/remotes/origin/master' was rewritten
+WARNING: Ref 'refs/remotes/origin/master' is unchanged
+```
+
+### Push existing code to new GitHub repo
+
+Really this works for any Git hosting service.
+
+```bash
+git remote add origin git@github.com:shatil/letters.git
+git push -u origin master
+```
+
+If there's no code but it's a new repo nonetheless:
+
+```bash
+echo "# letters" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin git@github.com:shatil/letters.git
+git push -u origin master
+```
+
 ## GitHub
 
 Visit account [Settings/Emails](https://github.com/settings/emails) to find

@@ -225,6 +225,36 @@ Confirm:
 git config user.email
 ```
 
+### Repo surgery
+
+Beware that modifying commits (e.g., fixing messages), while it looks on the
+local repo like original dates are used, GitHub will not buy it.
+
+Original:
+
+```diff
+commit a9f6cd75f4907856650b738f10070ef1010cba3d
+Author: Shatil Rafiullah <16421632+shatil@users.noreply.github.com>
+Date:   Wed Feb 8 18:17:39 2012 -0800
+
+    Added some cosmetic edits to differentiate 'ta' from 'tA' and such for shaatibiyyah-22-fathi-wal-imaalah.
+```
+
+Reword using `git rebase -i` and selecting `reword`:
+
+```diff
+commit 9a852c0d38b824a12d7b3383978b8ee06165ab85
+Author: Shatil Rafiullah <16421632+shatil@users.noreply.github.com>
+Date:   Wed Feb 8 18:17:39 2012 -0800
+
+    Added some cosmetic edits to differentiate 'ta' from 'tA'
+
+    And related things for `shaatibiyyah-22-fathi-wal-imaalah`.
+```
+
+Result is pretty Git history locally, but sadly, it's not reflected in GitHub's
+dates or comnit history.
+
 ## Golang
 
 ### Data race

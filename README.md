@@ -257,6 +257,37 @@ dates or comnit history.
 
 ## Golang
 
+### Benchmark
+
+Compare performance of implementation choices using Go's built-in support for
+parameterized benchmarks:
+
+```go
+func BenchmarkSomething(b *testing.B) {
+	benches := []struct {
+		name     string
+		function func(string) bool
+		param    string
+	}{
+		{"og", oldFunc, "param1"},
+		{"fresh", freshFunc, "freshParam"},
+	}
+	for _, bb := range benches {
+		b.Run(bb.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				bb.function(bb.param)
+			}
+		})
+	}
+}
+```
+
+Run _all_ benchmarks, or modify to target a few:
+
+```zsh
+go test -benchmem -run=^$ ./... -bench ^(BenchmarkSomething)$
+```
+
 ### Data race
 
 Pushing or popping via a `container/heap` like this causes a data race:

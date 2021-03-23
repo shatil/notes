@@ -460,6 +460,25 @@ url.Parse("%")
 
 ## Python
 
+### Deadline
+
+Execute a function with a deadline, like
+https://stackoverflow.com/a/601168:
+
+```python
+@contextlib.contextmanager
+def deadline(seconds: int):
+    """Use `with` statement to execute a function with a deadline."""
+    def handler(signalnum, frame):
+        raise TimeoutError("Timed out executing function.")
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+```
+
 ### Dependency Management
 
 I used to use `pip` or `pip3` to install dependencies on machines, or use

@@ -505,28 +505,6 @@ same](https://docs.python.org/3/library/typing.html#typing.Tuple) type:
 > e.g. `Tuple[int, ...]`. A plain `Tuple` is equivalent to `Tuple[Any, ...]`,
 > and in turn to `tuple`.
 
-### WatchedFileHandler
-
-Writing (or printing) to files being modified by `logrotate` can have undefined
-results, which
-[`WatchedFileHandler`](https://docs.python.org/3/library/logging.handlers.html#watchedfilehandler)
-can smoothly handle.
-
-```python
-import logging
-import logging.handlers
-
-handler = logging.handlers.WatchedFileHandler('/tmp/watching.log')
-handler.setFormatter(logging.Formatter('%(message)s'))
-
-log = logging.getLogger('sent-to-file')
-log.addHandler(handler)
-log.setLevel(logging.DEBUG)
-
-log.info('hello, world')  # write to /tmp/watching.log
-logging.critical('does not go to file')
-```
-
 ### YAML
 
 [`ruamel.yaml`](https://yaml.readthedocs.io/en/latest/pyyaml.html) support
@@ -609,4 +587,26 @@ It looks like:
 
 ```bash
 2019-04-04 22:48:24,716 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+```
+
+#### WatchedFileHandler
+
+Writing (or printing) to files being modified by `logrotate` can have undefined
+results, which
+[`WatchedFileHandler`](https://docs.python.org/3/library/logging.handlers.html#watchedfilehandler)
+can smoothly handle.
+
+```python
+import logging
+import logging.handlers
+
+handler = logging.handlers.WatchedFileHandler('/tmp/watching.log')
+handler.setFormatter(logging.Formatter('%(message)s'))
+
+log = logging.getLogger('sent-to-file')
+log.addHandler(handler)
+log.setLevel(logging.DEBUG)
+
+log.info('hello, world')  # write to /tmp/watching.log
+logging.critical('does not go to file')
 ```

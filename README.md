@@ -498,6 +498,35 @@ pipenv install coloredlogs
 [Type hints cheat sheet (Python
 3)](https://mypy.readthedocs.io/en/latest/cheat_sheet_py3.html)
 
+Tuples whose [elements are the
+same](https://docs.python.org/3/library/typing.html#typing.Tuple) type:
+
+> To specify a variable-length tuple of homogeneous type, use literal ellipsis,
+> e.g. `Tuple[int, ...]`. A plain `Tuple` is equivalent to `Tuple[Any, ...]`,
+> and in turn to `tuple`.
+
+### WatchedFileHandler
+
+Writing (or printing) to files being modified by `logrotate` can have undefined
+results, which
+[`WatchedFileHandler`](https://docs.python.org/3/library/logging.handlers.html#watchedfilehandler)
+can smoothly handle.
+
+```python
+import logging
+import logging.handlers
+
+handler = logging.handlers.WatchedFileHandler('/tmp/watching.log')
+handler.setFormatter(logging.Formatter('%(message)s'))
+
+log = logging.getLogger('sent-to-file')
+log.addHandler(handler)
+log.setLevel(logging.DEBUG)
+
+log.info('hello, world')  # write to /tmp/watching.log
+logging.critical('does not go to file')
+```
+
 ### YAML
 
 [`ruamel.yaml`](https://yaml.readthedocs.io/en/latest/pyyaml.html) support
